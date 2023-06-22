@@ -10,7 +10,7 @@
                 </h1>
                 <hr>
                 <div style="margin: auto;">
-                    <img style="width: 20rem;" src="<%= product.imageUrl %>" alt="<%= product.title %>">
+                    <img src="<%= product.imageUrl %>" alt="<%= product.title %>">
                 </div>
                 <h2>$
                     <%= product.price %>
@@ -18,7 +18,9 @@
                 <p>
                     <%= product.description %>
                 </p>
-                <%- include('../includes/add-to-cart.ejs') %>
+                <% if(isAuthenticated){ %>
+                    <%- include('../includes/add-to-cart.ejs',{product:product}) %>
+                        <% } %>
 
             </main>
             <%- include('../includes/end.ejs') %>

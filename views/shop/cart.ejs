@@ -11,7 +11,7 @@
                         <% products.forEach(p=> { %>
                             <li class="cart__item">
                                 <h1>
-                                    <%= p.title %>
+                                    <%= p.productId.title %>
                                 </h1>
                                 <h2>
                                     Quantity : <%=p.quantity%>
@@ -19,14 +19,16 @@
                                 </h2>
                                 </p>
                                 <form method="POST" action="/cart-delete-item">
+                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                     <button class="btn danger" type="submit">Delete</button>
-                                    <input type="hidden" value="<%= p._id %>" name="id">
+                                    <input type="hidden" value="<%= p.productId._id %>" name="id">
                                 </form>
                                 </div>
                             </li>
                             <% }) %>
-                            <hr>
+                                <hr>
                                 <form action="/create-order" method="POST">
+                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                     <button type="submit" class="btn">Order Now!</button>
                                 </form>
                     </ul>
