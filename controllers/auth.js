@@ -147,7 +147,16 @@ exports.postSignup = (req, res, next) => {
       })
       return user.save()
     }).then(() => {
-      res.redirect('/login')
+      res.render('auth/login', {
+        path: '/login',
+        pageTitle: 'Login',
+        errorMessage: null,
+        oldInput: {
+          email: email,
+          password: ''
+        },
+        validationError: []
+      });
       console.log(email)
       return transporter.sendMail({
         to: email,

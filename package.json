@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/ronitsingh2001/nodejs#readme",
   "devDependencies": {
-    "nodemon": "^2.0.22"
+    "nodemon": "^1.14.9"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -33,7 +33,7 @@
     "express-validator": "^7.0.1",
     "mongodb": "^5.6.0",
     "mongoose": "^7.3.0",
-    "multer": "^1.4.5-lts.1",
+    "multer": "^1.4.0",
     "mysql2": "^3.3.3",
     "nodemailer": "^6.9.3",
     "nodemailer-sendgrid-transport": "^0.2.0",

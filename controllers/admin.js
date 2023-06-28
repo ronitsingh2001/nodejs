@@ -1,3 +1,5 @@
+const fs = require('fs')
+
 const { validationResult } = require('express-validator')
 const Product = require('../models/product');
 
@@ -17,13 +19,13 @@ exports.getAddProduct = (req, res, next) => {
 exports.postAddProduct = (req, res, next) => {
     // products.push({ title: req.body.title });
     const title = req.body.title;
-    const imageUrl = req.file;
+    const image = req.file;
     const price = req.body.price;
     const description = req.body.description;
 
     const errors = validationResult(req);
-    // console.log(imageUrl)
-    if (!imageUrl) {
+    console.log(image)
+    if (!image) {
         return res.status(422).render('admin/edit-product', {
             pageTitle: 'Add Product',
             path: '/admin/add-product',
@@ -49,7 +51,6 @@ exports.postAddProduct = (req, res, next) => {
                 hasError: true,
                 product: {
                     title: title,
-                    imageUrl: imageUrl,
                     price: price,
                     description: description
                 },
@@ -64,7 +65,7 @@ exports.postAddProduct = (req, res, next) => {
         title: title,
         price: price,
         description: description,
-        imageUrl: imageUrl,
+        imageUrl: image.path,
         userId: req.user._id
         // userId: req.user._id
     });
@@ -134,7 +135,7 @@ exports.getEditProduct = (req, res, next) => {
 exports.postEditProduct = (req, res, next) => {
     const prodId = req.body.productId;
     const updatedTitle = req.body.title;
-    const updatedImageUrl = req.body.imageUrl;
+    const image = req.file;
     const updatedPrice = req.body.price;
     const updatedDescription = req.body.description;
     const errors = validationResult(req);
@@ -149,7 +150,6 @@ exports.postEditProduct = (req, res, next) => {
                 hasError: true,
                 product: {
                     title: updatedTitle,
-                    imageUrl: updatedImageUrl,
                     price: updatedPrice,
                     description: updatedDescription,
                     _id: prodId
@@ -167,7 +167,9 @@ exports.postEditProduct = (req, res, next) => {
         product.title = updatedTitle;
         product.price = updatedPrice;
         product.description = updatedDescription;
-        product.imageUrl = updatedImageUrl;
+        if (image) {
+            product.imageUrl = image.path;
+        }
         return product.save().then(result => {
             console.log("Product Updated")
             res.redirect('/admin/products')
