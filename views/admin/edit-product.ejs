@@ -42,7 +42,7 @@
                                 <label for="description">Description</label>
                                 <textarea class="<%= validationError.find(e => e.path === 'description') ? 'invalid' :'' %>"
                                     name="description" id="description" rows="5"
-                                    value=""><% if(editing || hasError){ %> <%=product.description%><% } %></textarea>
+                                    value=""><% if(editing || hasError){ %><%=product.description%><% } %></textarea>
                             </div>
 
                             <% if(editing) { %>

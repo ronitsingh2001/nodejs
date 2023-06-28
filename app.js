@@ -15,6 +15,8 @@ const MONGODB_URI = 'mongodb+srv://ronit2001krish:kkNCbvJXytrV5fFe@cluster0.pzq3
 
 
 const app = express();
+
+
 const store = new mongodbStore({
     uri: MONGODB_URI,
     collection: 'sessions'
@@ -22,13 +24,21 @@ const store = new mongodbStore({
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, '/tmp/my-uploads')
+        cb(null, 'data/images')
     },
     filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-        cb(null, file.fieldname + '-' + uniqueSuffix)
+        const uniqueSuffix = Date.now()
+        cb(null, uniqueSuffix + '-' + file.originalname)
     }
 })
+
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype === 'image/png', file.mimetype === 'image/jpg', file.mimetype === 'image/jpeg') {
+        cb(null, true)
+    } else {
+        cb(null, false)
+    }
+}
 // const fileStorage = multer.diskStorage({
 //     destination: (req, file, cb) => {
 //         cb(null, 'images');
@@ -40,17 +50,26 @@ const storage = multer.diskStorage({
 
 const csrfProtection = csrf()
 
+// ********* Telling Node About view engine **********
 app.set('view engine', 'ejs');
 app.set('views', 'views')
 
+
+// ********* importing Routes ****************
 const adminRoutes = require('./routes/admin')
 const shopRoutes = require('./routes/shop')
 const authRoutes = require('./routes/auth')
 
 
+// ***************Parsing request data********** //
+app.use(multer({ storage: storage, fileFilter: fileFilter }).single('image'));
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(multer({ storage: storage }).single('image'))
+
+// ********* Serving files data statically ****************
 app.use(express.static(path.join(__dirname, 'public')))
+app.use('/data',express.static(path.join(__dirname, 'data')))
+
+// ******Storing session***********
 app.use(session({
     secret: 'my secret',
     resave: false,
@@ -58,15 +77,13 @@ app.use(session({
     store: store
 }))
 
+// ***********crsf attack avoidance **********
 app.use(csrfProtection);
 app.use(flash())
 
-app.use((req, res, next) => {
-    res.locals.isAuthenticated = req.session.isLoggedIn;
-    res.locals.csrfToken = req.csrfToken();
-    next()
-})
 
+
+// ********* Setting user attribut eto request if found **************
 app.use((req, res, next) => {
     // throw new Error('Dummy')
     if (!req.session.user) {
@@ -78,6 +95,7 @@ app.use((req, res, next) => {
                 return next()
             }
             req.user = user;
+            // console.log(user)
             next()
         })
         .catch(err => {
@@ -86,22 +104,34 @@ app.use((req, res, next) => {
         })
 })
 
+// *********Setting local variables so that they are available to all requests **************
+app.use((req, res, next) => {
+    res.locals.isAuthenticated = req.session.isLoggedIn;
+    res.locals.csrfToken = req.csrfToken();
+    next()
+})
 
+// *********** Providing routes ************ 
 app.use('/admin/', adminRoutes)
 app.use(shopRoutes)
 app.use(authRoutes)
 
+// ***********Error Routes ***********
 app.use('/500', errorController.get500Page)
 app.use(errorController.get404Page);
 
+
+// ******** Express error handling ***********
 app.use((err, req, res, next) => {
-    // console.log(req.session)
+    console.log(err)
     res.status(500).render('500', {
-        pageTitle: 'Error', path: '/500', isAuthenticated: req.session.isLoggedIn
+        pageTitle: 'Error',
+        path: '/500',
+        isAuthenticated: req.session.isLoggedIn
     });
 })
 
-
+// ************** Connecting to mongoDB ***********
 mongoose.connect(MONGODB_URI)
     .then(result => {
         // User.findOne().then(user => {
